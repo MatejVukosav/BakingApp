@@ -16,7 +16,7 @@ public class ApiSteps implements Serializable {
     String shortDescription;
     @Json(name = "description")
     String description;
-    @Json(name = "videoUrl")
+    @Json(name = "videoURL")
     String videoUrl;
     @Json(name = "thumbnailURL")
     String thumbnailUrl;

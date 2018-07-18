@@ -11,6 +11,8 @@ import com.vuki.bakingapp.databinding.ActivityRecipeDetailsBinding;
 import com.vuki.bakingapp.models.ApiReceipt;
 import com.vuki.bakingapp.ui.step.StepActivity;
 
+import java.io.Serializable;
+
 public class RecipeDetails extends AppCompatActivity implements ReceiptDetailsActivityRecyclerViewAdapter.OnItemClickListener {
 
     ActivityRecipeDetailsBinding binding;
@@ -37,7 +39,8 @@ public class RecipeDetails extends AppCompatActivity implements ReceiptDetailsAc
     public void onItemClick( int position ) {
         Intent intent = new Intent( RecipeDetails.this, StepActivity.class );
         Bundle bundle = new Bundle();
-        bundle.putSerializable( "step", this.receipt.getSteps().get( position ) );
+        bundle.putSerializable( "steps", (Serializable) receipt.getSteps() );
+        bundle.putInt( "current_step", position );
         intent.putExtras( bundle );
         startActivity( intent );
     }

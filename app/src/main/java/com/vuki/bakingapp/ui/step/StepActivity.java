@@ -1,6 +1,7 @@
 package com.vuki.bakingapp.ui.step;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -82,6 +83,11 @@ public class StepActivity extends BaseActivity {
             }
         } );
 
+        if ( this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ) {
+            binding.toolbar.setVisibility( View.GONE );
+        } else {
+            binding.toolbar.setVisibility( View.VISIBLE );
+        }
     }
 
     private void populateData( ApiSteps step ) {

@@ -21,10 +21,10 @@ import com.vuki.bakingapp.models.ApiSteps;
  */
 public class StepFragment extends Fragment {
 
-    private ApiSteps step;
+    public ApiSteps step;
     private MediaController mediaController;
     private FragmentStepBinding binding;
-    public static String ARGUMENT_STEP="step";
+    public static String ARGUMENT_STEP = "step";
 
     public static StepFragment newInstance( ApiSteps step ) {
         StepFragment fragmentDemo = new StepFragment();
@@ -84,7 +84,7 @@ public class StepFragment extends Fragment {
                 mp.setOnVideoSizeChangedListener( new MediaPlayer.OnVideoSizeChangedListener() {
                     @Override
                     public void onVideoSizeChanged( MediaPlayer mp, int width, int height ) {
-                        mediaController = new MediaController( getContext() );
+                        mediaController = new MediaController( getActivity() );
                         binding.video.setMediaController( mediaController );
                         mediaController.setAnchorView( binding.video );
                     }
@@ -103,7 +103,6 @@ public class StepFragment extends Fragment {
     }
 
     public void populateData( ApiSteps step ) {
-
         binding.instructions.setText( step.getDescription() );
         if ( binding.video.isPlaying() ) {
             binding.video.stopPlayback();

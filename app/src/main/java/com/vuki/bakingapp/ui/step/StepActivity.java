@@ -86,7 +86,7 @@ public class StepActivity extends BaseActivity {
 
     private void populateData( ApiSteps step ) {
 
-        setupToolbar( binding.toolbar, step.getShortDescription() );
+        setupToolbar( binding.toolbar, currentStep == 0 ? step.getShortDescription() : currentStep + ". " + step.getShortDescription() );
 
         binding.instructions.setText( step.getDescription() );
         if ( binding.video.isPlaying() ) {

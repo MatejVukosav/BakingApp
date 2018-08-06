@@ -47,7 +47,7 @@ public class ReceiptDetailsActivityRecyclerViewAdapter extends RecyclerView.Adap
         ApiSteps item = list.get( position );
         holder.bind( item, onItemClickListener );
 
-        holder.binding.title.setText( item.getShortDescription() );
+        holder.binding.title.setText( position == 0 ? item.getShortDescription() : position+". " + item.getShortDescription() );
     }
 
     @Override

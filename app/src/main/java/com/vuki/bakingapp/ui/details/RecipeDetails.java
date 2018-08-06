@@ -1,20 +1,19 @@
 package com.vuki.bakingapp.ui.details;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 
 import com.vuki.bakingapp.R;
 import com.vuki.bakingapp.databinding.ActivityRecipeDetailsBinding;
 import com.vuki.bakingapp.models.ApiReceipt;
+import com.vuki.bakingapp.ui.BaseActivity;
 import com.vuki.bakingapp.ui.step.StepActivity;
 
 import java.io.Serializable;
 
-public class RecipeDetails extends AppCompatActivity implements ReceiptDetailsActivityRecyclerViewAdapter.OnItemClickListener {
+public class RecipeDetails extends BaseActivity implements ReceiptDetailsActivityRecyclerViewAdapter.OnItemClickListener {
 
     ActivityRecipeDetailsBinding binding;
     ReceiptDetailsActivityRecyclerViewAdapter adapter;
@@ -32,13 +31,10 @@ public class RecipeDetails extends AppCompatActivity implements ReceiptDetailsAc
                 adapter = new ReceiptDetailsActivityRecyclerViewAdapter( this, receipt.getSteps(), this );
                 binding.recyclerView.setLayoutManager( new LinearLayoutManager( this ) );
                 binding.recyclerView.setAdapter( adapter );
+                setupToolbar( binding.toolbar, receipt.getName() );
             }
         }
 
-        ActionBar actionBar = getActionBar();
-        if ( actionBar != null ) {
-            actionBar.setTitle( receipt.getName() );
-        }
     }
 
     @Override

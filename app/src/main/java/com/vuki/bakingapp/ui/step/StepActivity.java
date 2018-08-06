@@ -5,7 +5,6 @@ import android.databinding.DataBindingUtil;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.MediaController;
@@ -13,10 +12,11 @@ import android.widget.MediaController;
 import com.vuki.bakingapp.R;
 import com.vuki.bakingapp.databinding.ActivityStepBinding;
 import com.vuki.bakingapp.models.ApiSteps;
+import com.vuki.bakingapp.ui.BaseActivity;
 
 import java.util.List;
 
-public class StepActivity extends AppCompatActivity {
+public class StepActivity extends BaseActivity {
 
     ActivityStepBinding binding;
     List<ApiSteps> steps;
@@ -85,6 +85,9 @@ public class StepActivity extends AppCompatActivity {
     }
 
     private void populateData( ApiSteps step ) {
+
+        setupToolbar( binding.toolbar, step.getShortDescription() );
+
         binding.instructions.setText( step.getDescription() );
         if ( binding.video.isPlaying() ) {
             binding.video.stopPlayback();
@@ -94,7 +97,7 @@ public class StepActivity extends AppCompatActivity {
             binding.video.setVisibility( View.VISIBLE );
             binding.video.setVideoURI( Uri.parse( step.getVideoUrl() ) );
             binding.video.start();
-        }else{
+        } else {
             binding.video.setVisibility( View.GONE );
         }
     }

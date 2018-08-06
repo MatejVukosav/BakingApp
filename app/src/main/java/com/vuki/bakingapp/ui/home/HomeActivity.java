@@ -41,6 +41,7 @@ public class HomeActivity extends AppCompatActivity
 
         try {
             items = moshi.adapter( ApiReceipts.class ).fromJson( jsonLocation );
+            assert items != null;
         } catch ( IOException e ) {
             e.printStackTrace();
         }

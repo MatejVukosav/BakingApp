@@ -1,5 +1,6 @@
 package com.vuki.bakingapp.ui.details;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -27,11 +28,16 @@ public class RecipeDetails extends AppCompatActivity implements ReceiptDetailsAc
         Bundle extras = getIntent().getExtras();
         if ( extras != null ) {
             receipt = (ApiReceipt) extras.getSerializable( "receipt" );
-            if ( receipt.getSteps() != null ) {
+            if ( receipt != null && receipt.getSteps() != null ) {
                 adapter = new ReceiptDetailsActivityRecyclerViewAdapter( this, receipt.getSteps(), this );
                 binding.recyclerView.setLayoutManager( new LinearLayoutManager( this ) );
                 binding.recyclerView.setAdapter( adapter );
             }
+        }
+
+        ActionBar actionBar = getActionBar();
+        if ( actionBar != null ) {
+            actionBar.setTitle( receipt.getName() );
         }
     }
 

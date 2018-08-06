@@ -67,6 +67,7 @@ public class ReceiptDetailsFragment
                 new DividerItemDecoration( binding.recyclerView.getContext(),
                         DividerItemDecoration.VERTICAL ) );
 
+
         return binding.getRoot();
     }
 

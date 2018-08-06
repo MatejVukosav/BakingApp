@@ -35,19 +35,29 @@ public class ReceiptDetailsActivityRecyclerViewAdapter extends RecyclerView.Adap
     }
 
     @Override
-    public ViewHolder onCreateViewHolder( @NonNull ViewGroup parent, int viewType ) {
+    public ViewHolder onCreateViewHolder( @NonNull ViewGroup parent, final int viewType ) {
         final ItemStepBinding binding = DataBindingUtil
                 .inflate( LayoutInflater.from( parent.getContext() ),
                         R.layout.item_step, parent, false );
-        return new ViewHolder( binding );
+
+        final ViewHolder viewHolder = new ViewHolder( binding );
+        viewHolder.binding.title.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View v ) {
+                onItemClickListener.onItemClick( viewHolder.getLayoutPosition() );
+            }
+        } );
+
+        return viewHolder;
     }
 
     @Override
     public void onBindViewHolder( @NonNull ViewHolder holder, int position ) {
         ApiSteps item = list.get( position );
-        holder.bind( item, onItemClickListener );
 
-        holder.binding.title.setText( position == 0 ? item.getShortDescription() : position+". " + item.getShortDescription() );
+
+
+        holder.binding.title.setText( position == 0 ? item.getShortDescription() : position + ". " + item.getShortDescription() );
     }
 
     @Override
@@ -61,17 +71,6 @@ public class ReceiptDetailsActivityRecyclerViewAdapter extends RecyclerView.Adap
         public ViewHolder( ItemStepBinding binding ) {
             super( binding.getRoot() );
             this.binding = binding;
-        }
-
-        public void bind( final ApiSteps model,
-                          final OnItemClickListener listener ) {
-            itemView.setOnClickListener( new View.OnClickListener() {
-                @Override
-                public void onClick( View v ) {
-                    listener.onItemClick( getLayoutPosition() );
-
-                }
-            } );
         }
     }
 

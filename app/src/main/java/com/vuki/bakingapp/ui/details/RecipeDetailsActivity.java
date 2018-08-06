@@ -3,24 +3,26 @@ package com.vuki.bakingapp.ui.details;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v4.app.FragmentTransaction;
 
 import com.vuki.bakingapp.R;
 import com.vuki.bakingapp.databinding.ActivityRecipeDetailsBinding;
 import com.vuki.bakingapp.models.ApiIngredient;
 import com.vuki.bakingapp.models.ApiReceipt;
+import com.vuki.bakingapp.models.ApiSteps;
 import com.vuki.bakingapp.ui.BaseActivity;
 import com.vuki.bakingapp.ui.step.StepActivity;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class RecipeDetails extends BaseActivity implements ReceiptDetailsActivityRecyclerViewAdapter.OnItemClickListener {
+public class RecipeDetailsActivity
+        extends BaseActivity
+        implements ReceiptDetailsFragment.OnItemSelectedListener {
 
     ActivityRecipeDetailsBinding binding;
-    ReceiptDetailsActivityRecyclerViewAdapter adapter;
     ApiReceipt receipt;
+    private ReceiptDetailsFragment receiptDetailsFragment;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -31,12 +33,13 @@ public class RecipeDetails extends BaseActivity implements ReceiptDetailsActivit
         if ( extras != null ) {
             receipt = (ApiReceipt) extras.getSerializable( "receipt" );
             if ( receipt != null && receipt.getSteps() != null ) {
-                adapter = new ReceiptDetailsActivityRecyclerViewAdapter( this, receipt.getSteps(), this );
-                binding.recyclerView.setLayoutManager( new LinearLayoutManager( this ) );
-                binding.recyclerView.setAdapter( adapter );
-                binding.recyclerView.addItemDecoration(
-                        new DividerItemDecoration( binding.recyclerView.getContext(),
-                                DividerItemDecoration.VERTICAL ) );
+
+                if ( savedInstanceState == null ) {
+                    receiptDetailsFragment = ReceiptDetailsFragment.newInstance( receipt );
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace( R.id.fragment_receipt_steps, receiptDetailsFragment );
+                    ft.commit();
+                }
 
                 setupToolbar( binding.toolbar, receipt.getName() );
 
@@ -60,8 +63,8 @@ public class RecipeDetails extends BaseActivity implements ReceiptDetailsActivit
     }
 
     @Override
-    public void onItemClick( int position ) {
-        Intent intent = new Intent( RecipeDetails.this, StepActivity.class );
+    public void onItemSelected( ApiSteps step, int position ) {
+        Intent intent = new Intent( RecipeDetailsActivity.this, StepActivity.class );
         Bundle bundle = new Bundle();
         bundle.putSerializable( "steps", (Serializable) receipt.getSteps() );
         bundle.putInt( "current_step", position );

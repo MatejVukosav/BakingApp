@@ -14,7 +14,7 @@ import com.vuki.bakingapp.R;
 import com.vuki.bakingapp.databinding.ActivityMainBinding;
 import com.vuki.bakingapp.models.ApiReceipt;
 import com.vuki.bakingapp.models.ApiReceipts;
-import com.vuki.bakingapp.ui.details.RecipeDetails;
+import com.vuki.bakingapp.ui.details.RecipeDetailsActivity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,7 +68,7 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onItemClick( int position ) {
-        Intent intent = new Intent( HomeActivity.this, RecipeDetails.class );
+        Intent intent = new Intent( HomeActivity.this, RecipeDetailsActivity.class );
         ApiReceipt apiReceipt = items.getReceipts().get( position );
         Bundle bundle = new Bundle();
         bundle.putSerializable( "receipt", apiReceipt );

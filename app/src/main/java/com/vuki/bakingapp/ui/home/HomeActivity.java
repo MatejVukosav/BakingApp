@@ -6,6 +6,7 @@ import android.content.res.AssetManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 
 import com.squareup.moshi.Moshi;
@@ -47,7 +48,12 @@ public class HomeActivity extends AppCompatActivity
         }
         adapter = new HomeRecyclerViewAdapter( this, items.getReceipts(), this );
         binding.recyclerView.setAdapter( adapter );
-        binding.recyclerView.setLayoutManager( new LinearLayoutManager( this ) );
+        if ( getResources().getBoolean( R.bool.isTablet ) ) {
+            binding.recyclerView.setLayoutManager( new GridLayoutManager( this, 3 ) );
+        } else {
+            binding.recyclerView.setLayoutManager( new LinearLayoutManager( this ) );
+        }
+
     }
 
     public static String AssetJSONFile( String filename, Context context ) throws IOException {

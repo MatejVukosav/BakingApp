@@ -15,7 +15,6 @@ public class ImageHelper {
             return;
         }
         Picasso picasso = Picasso.get();
-//        picasso.setIndicatorsEnabled( true );
         picasso.load( url )
                 .placeholder( android.R.drawable.ic_menu_report_image )
                 .error( android.R.drawable.stat_notify_error )

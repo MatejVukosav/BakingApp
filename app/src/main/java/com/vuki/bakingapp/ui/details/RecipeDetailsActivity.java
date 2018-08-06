@@ -27,8 +27,10 @@ public class RecipeDetailsActivity
     private ReceiptDetailsFragment receiptDetailsFragment;
     private int currentStep = 0;
     private StepFragment stepFragment;
-    private static String SAVED_INSTANCE_CURRENT_STEP = "current_step";
-    private static String SAVED_INSTANCE_RECEIPT = "receipt";
+    public static String CURRENT_STEP = "current_step";
+    public static String STEPS = "steps";
+    private static String SAVED_INSTANCE_CURRENT_STEP = "saved_instance_current_step";
+    private static String SAVED_INSTANCE_RECEIPT = "saved_instance_receipt";
     private static String SAVED_INSTANCE_RECEIPT_DETAILS_FRAGMENT = "receipt_details_fragment";
     private static String SAVED_INSTANCE_STEPS_FRAGMENT = "steps_fragment";
 
@@ -82,8 +84,10 @@ public class RecipeDetailsActivity
         outState.putInt( SAVED_INSTANCE_CURRENT_STEP, currentStep );
         outState.putSerializable( SAVED_INSTANCE_RECEIPT, receipt );
 
-        getSupportFragmentManager().putFragment( outState, SAVED_INSTANCE_RECEIPT_DETAILS_FRAGMENT, receiptDetailsFragment );
-        getSupportFragmentManager().putFragment( outState, SAVED_INSTANCE_STEPS_FRAGMENT, stepFragment );
+        if ( getResources().getBoolean( R.bool.isTablet ) ) {
+            getSupportFragmentManager().putFragment( outState, SAVED_INSTANCE_RECEIPT_DETAILS_FRAGMENT, receiptDetailsFragment );
+            getSupportFragmentManager().putFragment( outState, SAVED_INSTANCE_STEPS_FRAGMENT, stepFragment );
+        }
 
         super.onSaveInstanceState( outState );
     }
@@ -95,7 +99,7 @@ public class RecipeDetailsActivity
             ingredientsList
                     .append( " - " )
                     .append( ingredient.getIngredient() )
-                    .append( System.getProperty( "line.separator" ) );
+                    .append( System.lineSeparator() );
         }
 
         return ingredientsList.toString();
@@ -109,8 +113,8 @@ public class RecipeDetailsActivity
         } else {
             Intent intent = new Intent( RecipeDetailsActivity.this, StepActivity.class );
             Bundle bundle = new Bundle();
-            bundle.putSerializable( "steps", (Serializable) receipt.getSteps() );
-            bundle.putInt( "current_step", position );
+            bundle.putSerializable( STEPS, (Serializable) receipt.getSteps() );
+            bundle.putInt( CURRENT_STEP, position );
             intent.putExtras( bundle );
             startActivity( intent );
         }

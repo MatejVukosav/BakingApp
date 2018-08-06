@@ -10,6 +10,7 @@ import com.vuki.bakingapp.R;
 import com.vuki.bakingapp.databinding.ActivityStepBinding;
 import com.vuki.bakingapp.models.ApiSteps;
 import com.vuki.bakingapp.ui.BaseActivity;
+import com.vuki.bakingapp.ui.details.RecipeDetailsActivity;
 
 import java.util.List;
 
@@ -29,8 +30,8 @@ public class StepActivity extends BaseActivity implements StepFragment.OnChangeS
         if ( extras == null ) {
             finish();
         }
-        steps = (List<ApiSteps>) extras.getSerializable( "steps" );
-        currentStep = extras.getInt( "current_step" );
+        steps = (List<ApiSteps>) extras.getSerializable( RecipeDetailsActivity.STEPS );
+        currentStep = extras.getInt( RecipeDetailsActivity.CURRENT_STEP );
 
         if ( savedInstanceState == null ) {
             stepFragment = StepFragment.newInstance( steps.get( currentStep ) );

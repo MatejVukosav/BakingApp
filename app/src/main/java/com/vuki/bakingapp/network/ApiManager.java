@@ -12,7 +12,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
  */
 public class ApiManager implements ApiManagerInterface {
 
-    private static final String BASE_URL = "https://api.themoviedb.org/";
+    private static final String BASE_URL = "https://d17h27t6h515a5.cloudfront.net/";
     private static ApiManager apiManagerInstance;
     private static ApiManagerService apiManagerService;
     private static Moshi moshi;

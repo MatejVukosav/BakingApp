@@ -44,4 +44,23 @@ public class DataHelper {
         }
         return receipts;
     }
+
+    public static ApiReceipts getReceiptsFromNwtwork( Context context ) {
+
+        Moshi moshi = new Moshi.Builder().build();
+        ApiReceipts receipts = null;
+        String jsonLocation = "";
+        try {
+            jsonLocation = DataHelper.AssetJSONFile( DataHelper.DATA_FILE, context );
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
+
+        try {
+            receipts = moshi.adapter( ApiReceipts.class ).fromJson( jsonLocation );
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
+        return receipts;
+    }
 }

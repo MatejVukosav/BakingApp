@@ -1,30 +1,50 @@
 package com.vuki.bakingapp.ui.step;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.databinding.DataBindingUtil;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.MediaController;
 
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 import com.vuki.bakingapp.R;
 import com.vuki.bakingapp.databinding.FragmentStepBinding;
 import com.vuki.bakingapp.models.ApiSteps;
+import com.vuki.bakingapp.player.PlayerListener;
+import com.vuki.bakingapp.player.SessionCallback;
 
 /**
  * Created by mvukosav
  */
-public class StepFragment extends Fragment {
+public class StepFragment extends Fragment implements PlayerListener {
 
-    public ApiSteps step;
-    private MediaController mediaController;
+    private static final String TAG = StepFragment.class.getCanonicalName();
+    public ApiSteps currentStep;
     private FragmentStepBinding binding;
-    public static String ARGUMENT_STEP = "step";
+    public static String ARGUMENT_STEP = "currentStep";
+    private PlaybackStateCompat.Builder mStateBuilder;
+    private static MediaSessionCompat mMediaSession;
+    private Context context;
+
+    private ExoPlayerManager exoPlayerManager;
 
     public static StepFragment newInstance( ApiSteps step ) {
         StepFragment fragmentDemo = new StepFragment();
@@ -32,6 +52,61 @@ public class StepFragment extends Fragment {
         args.putSerializable( ARGUMENT_STEP, step );
         fragmentDemo.setArguments( args );
         return fragmentDemo;
+    }
+
+    @Override
+    public void onTimelineChanged( Timeline timeline, @Nullable Object manifest, int reason ) {
+
+    }
+
+    @Override
+    public void onTracksChanged( TrackGroupArray trackGroups, TrackSelectionArray trackSelections ) {
+
+    }
+
+    @Override
+    public void onLoadingChanged( boolean isLoading ) {
+
+    }
+
+    @Override
+    public void onPlayerStateChanged( boolean playWhenReady, int playbackState ) {
+        if ( ( playbackState == Player.STATE_READY ) && playWhenReady ) {
+            mStateBuilder.setState( PlaybackStateCompat.STATE_PLAYING, exoPlayerManager.getPlayer().getCurrentPosition(), 1f );
+        } else if ( ( playbackState == Player.STATE_READY ) ) {
+            mStateBuilder.setState( PlaybackStateCompat.STATE_PAUSED, exoPlayerManager.getPlayer().getCurrentPosition(), 1f );
+        }
+        mMediaSession.setPlaybackState( mStateBuilder.build() );
+    }
+
+    @Override
+    public void onRepeatModeChanged( int repeatMode ) {
+
+    }
+
+    @Override
+    public void onShuffleModeEnabledChanged( boolean shuffleModeEnabled ) {
+
+    }
+
+    @Override
+    public void onPlayerError( ExoPlaybackException error ) {
+
+    }
+
+    @Override
+    public void onPositionDiscontinuity( int reason ) {
+
+    }
+
+    @Override
+    public void onPlaybackParametersChanged( PlaybackParameters playbackParameters ) {
+
+    }
+
+    @Override
+    public void onSeekProcessed() {
+
     }
 
     public interface OnChangeStepListener {
@@ -56,21 +131,30 @@ public class StepFragment extends Fragment {
     @Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
-        step = (ApiSteps) getArguments().getSerializable( ARGUMENT_STEP );
+        currentStep = (ApiSteps) getArguments().getSerializable( ARGUMENT_STEP );
+
+        this.context = getContext();
+        exoPlayerManager = new ExoPlayerManager();
+
+        initializeMediaSession();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        exoPlayerManager.releasePlayer();
     }
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState ) {
         binding = DataBindingUtil.inflate( inflater, R.layout.fragment_step, container, false );
-        populateData( step );
         binding.next.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View v ) {
                 listener.next();
             }
         } );
-
         binding.previous.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View v ) {
@@ -78,42 +162,76 @@ public class StepFragment extends Fragment {
 
             }
         } );
-        binding.video.setOnPreparedListener( new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared( MediaPlayer mp ) {
-                mp.setOnVideoSizeChangedListener( new MediaPlayer.OnVideoSizeChangedListener() {
-                    @Override
-                    public void onVideoSizeChanged( MediaPlayer mp, int width, int height ) {
-                        mediaController = new MediaController( getActivity() );
-                        binding.video.setMediaController( mediaController );
-                        mediaController.setAnchorView( binding.video );
-                    }
-                } );
-            }
-        } );
-
-        binding.video.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick( View v ) {
-                //binding.video.start();
-            }
-        } );
 
         return binding.getRoot();
     }
 
-    public void populateData( ApiSteps step ) {
-        binding.instructions.setText( step.getDescription() );
-        if ( binding.video.isPlaying() ) {
-            binding.video.stopPlayback();
-        }
+    @Override
+    public void onViewCreated( @NonNull View view, @Nullable Bundle savedInstanceState ) {
+        super.onViewCreated( view, savedInstanceState );
 
-        if ( !TextUtils.isEmpty( step.getVideoUrl() ) ) {
-            binding.video.setVisibility( View.VISIBLE );
-            binding.video.setVideoURI( Uri.parse( step.getVideoUrl() ) );
-            binding.video.start();
+        exoPlayerManager.initializePlayer( context, this );
+        binding.playerView.setPlayer( exoPlayerManager.getPlayer() );
+        populateData( currentStep );
+    }
+
+    /**
+     * Initializes the Media Session to be enabled with media buttons, transport controls, callbacks
+     * and media controller.
+     */
+    private void initializeMediaSession() {
+        // Create a MediaSessionCompat.
+        mMediaSession = new MediaSessionCompat( context, TAG );
+
+        // Enable callbacks from MediaButtons and TransportControls.
+        mMediaSession.setFlags( MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS );
+
+        // Do not let MediaButtons restart the player when the app is not visible.
+        mMediaSession.setMediaButtonReceiver( null );
+
+        // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player.
+        mStateBuilder = new PlaybackStateCompat.Builder()
+                .setActions(
+                        PlaybackStateCompat.ACTION_PLAY |
+                                PlaybackStateCompat.ACTION_PAUSE |
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE );
+
+        mMediaSession.setPlaybackState( mStateBuilder.build() );
+
+        // SessionCallback has methods that handle callbacks from a media controller.
+        mMediaSession.setCallback( new SessionCallback( exoPlayerManager.getPlayer() ) );
+
+        // Start the Media Session since the activity is active.
+        mMediaSession.setActive( true );
+    }
+
+    public void populateData( ApiSteps step ) {
+        currentStep = step;
+        binding.instructions.setText( currentStep.getDescription() );
+
+        if ( !TextUtils.isEmpty( currentStep.getVideoUrl() ) ) {
+            binding.playerView.setVisibility( View.VISIBLE );
+            exoPlayerManager.setMediaSource( prepareMediaSource() );
         } else {
-            binding.video.setVisibility( View.GONE );
+            exoPlayerManager.getPlayer().stop();
+            binding.playerView.setVisibility( View.GONE );
         }
+    }
+
+    private MediaSource prepareMediaSource() {
+        String userAgent = Util.getUserAgent( getContext(), getApplicationName( context ) );
+        return new ExtractorMediaSource.Factory(
+                new DefaultDataSourceFactory(
+                        context,
+                        userAgent ) )
+                .createMediaSource( Uri.parse( currentStep.getVideoUrl() ) );
+    }
+
+    public static String getApplicationName( Context context ) {
+        ApplicationInfo applicationInfo = context.getApplicationInfo();
+        int stringId = applicationInfo.labelRes;
+        return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString( stringId );
     }
 }

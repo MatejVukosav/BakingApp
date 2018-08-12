@@ -29,10 +29,10 @@ public class RecipeDetailsActivity
     private StepFragment stepFragment;
     public static String CURRENT_STEP = "current_step";
     public static String STEPS = "steps";
-    private static String SAVED_INSTANCE_CURRENT_STEP = "saved_instance_current_step";
-    private static String SAVED_INSTANCE_RECEIPT = "saved_instance_receipt";
+    public static String SAVED_INSTANCE_CURRENT_STEP = "saved_instance_current_step";
+    public static String SAVED_INSTANCE_RECEIPT = "saved_instance_receipt";
     private static String SAVED_INSTANCE_RECEIPT_DETAILS_FRAGMENT = "receipt_details_fragment";
-    private static String SAVED_INSTANCE_STEPS_FRAGMENT = "steps_fragment";
+    public static String SAVED_INSTANCE_STEPS_FRAGMENT = "steps_fragment";
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -67,7 +67,7 @@ public class RecipeDetailsActivity
                 currentStep = savedInstanceState.getInt( SAVED_INSTANCE_CURRENT_STEP );
                 receipt = (ApiReceipt) savedInstanceState.getSerializable( SAVED_INSTANCE_RECEIPT );
                 if ( isReceiptValid() ) {
-                    stepFragment.step = receipt.getSteps().get( currentStep );
+                    stepFragment.currentStep = receipt.getSteps().get( currentStep );
                     setupToolbar( receipt.getSteps().get( currentStep ) );
                 }
             }

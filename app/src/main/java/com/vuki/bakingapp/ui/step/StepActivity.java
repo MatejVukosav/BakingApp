@@ -14,12 +14,16 @@ import com.vuki.bakingapp.ui.details.RecipeDetailsActivity;
 
 import java.util.List;
 
+import static com.vuki.bakingapp.ui.details.RecipeDetailsActivity.SAVED_INSTANCE_CURRENT_STEP;
+import static com.vuki.bakingapp.ui.details.RecipeDetailsActivity.SAVED_INSTANCE_STEPS_FRAGMENT;
+
 public class StepActivity extends BaseActivity implements StepFragment.OnChangeStepListener {
 
     private ActivityStepBinding binding;
     private List<ApiSteps> steps;
-    private int currentStep = -1;
+    private int currentStepIndex = -1;
     private StepFragment stepFragment;
+    private ApiSteps currentStep;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -29,16 +33,24 @@ public class StepActivity extends BaseActivity implements StepFragment.OnChangeS
         Bundle extras = getIntent().getExtras();
         if ( extras == null ) {
             finish();
+        } else {
+            steps = (List<ApiSteps>) extras.getSerializable( RecipeDetailsActivity.STEPS );
+            currentStepIndex = extras.getInt( RecipeDetailsActivity.CURRENT_STEP );
         }
-        steps = (List<ApiSteps>) extras.getSerializable( RecipeDetailsActivity.STEPS );
-        currentStep = extras.getInt( RecipeDetailsActivity.CURRENT_STEP );
 
         if ( savedInstanceState == null ) {
-            stepFragment = StepFragment.newInstance( steps.get( currentStep ) );
+            currentStep = steps.get( currentStepIndex );
+            stepFragment = StepFragment.newInstance( currentStep );
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace( R.id.fragment, stepFragment );
             ft.commit();
+        } else {
+            stepFragment = (StepFragment) getSupportFragmentManager().getFragment( savedInstanceState, SAVED_INSTANCE_STEPS_FRAGMENT );
+            currentStepIndex = savedInstanceState.getInt( SAVED_INSTANCE_CURRENT_STEP );
+            currentStep = steps.get( currentStepIndex );
+            stepFragment.currentStep = currentStep;
         }
+        setupToolbar( currentStep );
 
         if ( this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ) {
             binding.toolbar.setVisibility( View.GONE );
@@ -47,31 +59,41 @@ public class StepActivity extends BaseActivity implements StepFragment.OnChangeS
         }
     }
 
+    private void setupToolbar( ApiSteps step ) {
+        setupToolbar( binding.toolbar, currentStepIndex == 0
+                ? step.getShortDescription()
+                : currentStepIndex + ". " + step.getShortDescription() );
+    }
+
+    @Override
+    protected void onSaveInstanceState( Bundle outState ) {
+        outState.putInt( SAVED_INSTANCE_CURRENT_STEP, currentStepIndex );
+        getSupportFragmentManager().putFragment( outState, SAVED_INSTANCE_STEPS_FRAGMENT, stepFragment );
+        super.onSaveInstanceState( outState );
+    }
+
     @Override
     public void previous() {
-        if ( currentStep == 0 ) {
+        if ( currentStepIndex == 0 ) {
             return;
         }
-        currentStep--;
+        currentStepIndex--;
         changeStep();
     }
 
     @Override
     public void next() {
-        if ( currentStep == steps.size() - 1 ) {
+        if ( currentStepIndex == steps.size() - 1 ) {
             return;
         }
-        currentStep++;
-
+        currentStepIndex++;
         changeStep();
     }
 
     private void changeStep() {
-        ApiSteps step = steps.get( currentStep );
-        setupToolbar( binding.toolbar, currentStep == 0
-                ? step.getShortDescription()
-                : currentStep + ". " + step.getShortDescription() );
-        stepFragment.populateData( step );
-
+        currentStep = steps.get( currentStepIndex );
+        setupToolbar( currentStep );
+        stepFragment.populateData( currentStep );
     }
+
 }

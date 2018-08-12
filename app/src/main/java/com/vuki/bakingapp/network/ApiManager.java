@@ -25,7 +25,7 @@ public class ApiManager implements ApiManagerInterface {
             apiManagerInstance = new ApiManager();
 
             OkHttpClient client = new OkHttpClient.Builder()
-                    .addInterceptor( new LoggingInterceptor( LoggingInterceptor.LogLevel.FULL ) )
+                    .addInterceptor( new LoggingInterceptor( LoggingInterceptor.LogLevel.NONE ) )
                     .build();
 
             moshi = new Moshi.Builder()

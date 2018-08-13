@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.view.View;
 
 import com.vuki.bakingapp.R;
 import com.vuki.bakingapp.databinding.ActivityRecipeDetailsBinding;
@@ -74,6 +75,10 @@ public class RecipeDetailsActivity
                     setupToolbar( receipt.getSteps().get( currentStep ) );
                 }
             }
+        }
+
+        if ( !getResources().getBoolean( R.bool.isTablet ) ) {
+            binding.nestedScrollView.fullScroll( View.FOCUS_UP );
         }
 
     }

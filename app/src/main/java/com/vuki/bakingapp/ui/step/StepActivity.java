@@ -40,15 +40,19 @@ public class StepActivity extends BaseActivity implements StepFragment.OnChangeS
 
         if ( savedInstanceState == null ) {
             currentStep = steps.get( currentStepIndex );
-            stepFragment = StepFragment.newInstance( currentStep );
+            stepFragment = StepFragment.newInstance( currentStep, true, 0 );
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace( R.id.fragment, stepFragment );
             ft.commit();
         } else {
             stepFragment = (StepFragment) getSupportFragmentManager().getFragment( savedInstanceState, SAVED_INSTANCE_STEPS_FRAGMENT );
             currentStepIndex = savedInstanceState.getInt( SAVED_INSTANCE_CURRENT_STEP );
+            boolean playWhenReady = savedInstanceState.getBoolean( RecipeDetailsActivity.SAVED_INSTANCE_PLAY_WHEN_READY );
+            long playedVideoPosition = savedInstanceState.getLong( RecipeDetailsActivity.SAVED_INSTANCE_PLAYED_VIDEO_POSITION );
             currentStep = steps.get( currentStepIndex );
             stepFragment.currentStep = currentStep;
+            stepFragment.setPlayWhenReady( playWhenReady );
+            stepFragment.setVideoPosition( playedVideoPosition );
         }
         setupToolbar( currentStep );
 
@@ -68,6 +72,8 @@ public class StepActivity extends BaseActivity implements StepFragment.OnChangeS
     @Override
     protected void onSaveInstanceState( Bundle outState ) {
         outState.putInt( SAVED_INSTANCE_CURRENT_STEP, currentStepIndex );
+        outState.putBoolean( RecipeDetailsActivity.SAVED_INSTANCE_PLAY_WHEN_READY, stepFragment.shouldVideoAutoStart() );
+        outState.putLong( RecipeDetailsActivity.SAVED_INSTANCE_PLAYED_VIDEO_POSITION, stepFragment.getPlayedVideoLocation() );
         getSupportFragmentManager().putFragment( outState, SAVED_INSTANCE_STEPS_FRAGMENT, stepFragment );
         super.onSaveInstanceState( outState );
     }

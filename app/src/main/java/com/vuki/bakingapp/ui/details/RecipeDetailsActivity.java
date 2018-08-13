@@ -31,6 +31,8 @@ public class RecipeDetailsActivity
     public static String EXTRA_RECEIPT = "receipt";
     public static String STEPS = "steps";
     public static String SAVED_INSTANCE_CURRENT_STEP = "saved_instance_current_step";
+    public static String SAVED_INSTANCE_PLAY_WHEN_READY = "saved_instance_play_when_ready";
+    public static String SAVED_INSTANCE_PLAYED_VIDEO_POSITION = "saved_instance_played_video_position";
     public static String SAVED_INSTANCE_RECEIPT = "saved_instance_receipt";
     private static String SAVED_INSTANCE_RECEIPT_DETAILS_FRAGMENT = "receipt_details_fragment";
     public static String SAVED_INSTANCE_STEPS_FRAGMENT = "steps_fragment";
@@ -51,7 +53,7 @@ public class RecipeDetailsActivity
 
         if ( savedInstanceState == null ) {
             if ( getResources().getBoolean( R.bool.isTablet ) ) {
-                stepFragment = StepFragment.newInstance( receipt.getSteps().get( 0 ) );
+                stepFragment = StepFragment.newInstance( receipt.getSteps().get( 0 ), true, 0 );
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace( R.id.fragment_step, stepFragment );
                 ft.commit();

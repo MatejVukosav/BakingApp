@@ -22,7 +22,9 @@
             android:name=".ui.details.RecipeDetailsActivity"
             android:launchMode="singleTop">
         </activity>
-        <activity android:name=".ui.step.StepActivity">
+        <activity
+            android:name=".ui.step.StepActivity"
+            android:configChanges="orientation|screenSize|layoutDirection">
         </activity>
 
         <!--APP WIDGET-->

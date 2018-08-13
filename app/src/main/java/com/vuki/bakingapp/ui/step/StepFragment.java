@@ -39,16 +39,23 @@ public class StepFragment extends Fragment implements Player.EventListener {
     public ApiSteps currentStep;
     private FragmentStepBinding binding;
     public static String ARGUMENT_STEP = "currentStep";
+    public static String ARGUMENT_VIDEO_POSITION = "video_position";
+    public static String ARGUMENT_PLAY_WHEN_READY = "play_when_ready";
     private PlaybackStateCompat.Builder mStateBuilder;
     private static MediaSessionCompat mMediaSession;
     private Context context;
 
+    private boolean playWhenReady = false;
+    private long videoPosition = 0;
+
     private ExoPlayerManager exoPlayerManager;
 
-    public static StepFragment newInstance( ApiSteps step ) {
+    public static StepFragment newInstance( ApiSteps step, boolean playWhenReady, long videoPosition ) {
         StepFragment fragmentDemo = new StepFragment();
         Bundle args = new Bundle();
         args.putSerializable( ARGUMENT_STEP, step );
+        args.putSerializable( ARGUMENT_VIDEO_POSITION, videoPosition );
+        args.putSerializable( ARGUMENT_PLAY_WHEN_READY, playWhenReady );
         fragmentDemo.setArguments( args );
         return fragmentDemo;
     }
@@ -131,6 +138,8 @@ public class StepFragment extends Fragment implements Player.EventListener {
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         currentStep = (ApiSteps) getArguments().getSerializable( ARGUMENT_STEP );
+        playWhenReady = (boolean) getArguments().getSerializable( ARGUMENT_PLAY_WHEN_READY );
+        videoPosition = (long) getArguments().getSerializable( ARGUMENT_VIDEO_POSITION );
 
         this.context = getContext();
         exoPlayerManager = new ExoPlayerManager();
@@ -171,6 +180,9 @@ public class StepFragment extends Fragment implements Player.EventListener {
 
         exoPlayerManager.initializePlayer( context, this );
         binding.playerView.setPlayer( exoPlayerManager.getPlayer() );
+
+        exoPlayerManager.getPlayer().setPlayWhenReady( playWhenReady );
+        exoPlayerManager.getPlayer().seekTo( videoPosition );
         populateData( currentStep );
     }
 
@@ -232,5 +244,21 @@ public class StepFragment extends Fragment implements Player.EventListener {
         ApplicationInfo applicationInfo = context.getApplicationInfo();
         int stringId = applicationInfo.labelRes;
         return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString( stringId );
+    }
+
+    public boolean shouldVideoAutoStart() {
+        return exoPlayerManager.getPlayer().getPlayWhenReady();
+    }
+
+    public long getPlayedVideoLocation() {
+        return Math.max( 0, exoPlayerManager.getPlayer().getContentPosition() );
+    }
+
+    public void setPlayWhenReady( boolean playWhenReady ) {
+        this.playWhenReady = playWhenReady;
+    }
+
+    public void setVideoPosition( long videoPosition ) {
+        this.videoPosition = videoPosition;
     }
 }

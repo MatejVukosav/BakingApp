@@ -9,7 +9,7 @@
         android:layout_height="140dp"
         android:layout_margin="8dp"
         android:elevation="4dp"
-        android:padding="16dp"
+        android:padding="@dimen/padding_medium"
         app:cardCornerRadius="4dp">
 
         <RelativeLayout

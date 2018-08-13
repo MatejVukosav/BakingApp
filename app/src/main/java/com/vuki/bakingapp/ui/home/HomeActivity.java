@@ -1,8 +1,10 @@
 package com.vuki.bakingapp.ui.home;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,7 +15,9 @@ import com.vuki.bakingapp.R;
 import com.vuki.bakingapp.databinding.ActivityMainBinding;
 import com.vuki.bakingapp.models.ApiReceipt;
 import com.vuki.bakingapp.network.ApiManager;
+import com.vuki.bakingapp.prefs.SharedPrefsUtils;
 import com.vuki.bakingapp.ui.details.RecipeDetailsActivity;
+import com.vuki.bakingapp.widget.ReceiptService;
 
 import java.util.List;
 
@@ -59,10 +63,16 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onItemClick( int position ) {
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences( this );
+        preferences.edit().putInt( SharedPrefsUtils.LAST_OPENED_RECEIPT, position + 1 ).apply();
+
+        ReceiptService.startActionUpdateWidget( this );
+
         Intent intent = new Intent( HomeActivity.this, RecipeDetailsActivity.class );
         ApiReceipt apiReceipt = items.get( position );
         Bundle bundle = new Bundle();
-        bundle.putSerializable( "receipt", apiReceipt );
+        bundle.putSerializable( RecipeDetailsActivity.EXTRA_RECEIPT, apiReceipt );
         intent.putExtras( bundle );
         startActivity( intent );
     }

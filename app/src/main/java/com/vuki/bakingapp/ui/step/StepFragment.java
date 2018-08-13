@@ -28,13 +28,12 @@ import com.google.android.exoplayer2.util.Util;
 import com.vuki.bakingapp.R;
 import com.vuki.bakingapp.databinding.FragmentStepBinding;
 import com.vuki.bakingapp.models.ApiSteps;
-import com.vuki.bakingapp.player.PlayerListener;
 import com.vuki.bakingapp.player.SessionCallback;
 
 /**
  * Created by mvukosav
  */
-public class StepFragment extends Fragment implements PlayerListener {
+public class StepFragment extends Fragment implements Player.EventListener {
 
     private static final String TAG = StepFragment.class.getCanonicalName();
     public ApiSteps currentStep;

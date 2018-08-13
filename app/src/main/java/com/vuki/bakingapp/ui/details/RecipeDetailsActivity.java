@@ -28,6 +28,7 @@ public class RecipeDetailsActivity
     private int currentStep = 0;
     private StepFragment stepFragment;
     public static String CURRENT_STEP = "current_step";
+    public static String EXTRA_RECEIPT = "receipt";
     public static String STEPS = "steps";
     public static String SAVED_INSTANCE_CURRENT_STEP = "saved_instance_current_step";
     public static String SAVED_INSTANCE_RECEIPT = "saved_instance_receipt";
@@ -41,7 +42,7 @@ public class RecipeDetailsActivity
 
         Bundle extras = getIntent().getExtras();
         if ( extras != null ) {
-            receipt = (ApiReceipt) extras.getSerializable( "receipt" );
+            receipt = (ApiReceipt) extras.getSerializable( EXTRA_RECEIPT );
             if ( isReceiptValid() ) {
                 setupToolbar( binding.toolbar, receipt.getName() );
                 binding.ingredients.setText( extractIngredients( receipt.getIngredients() ) );

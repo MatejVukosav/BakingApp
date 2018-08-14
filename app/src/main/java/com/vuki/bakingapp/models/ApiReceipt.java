@@ -40,6 +40,15 @@ public class ApiReceipt implements Serializable {
         in.readList( new ArrayList(), ApiSteps.class.getClassLoader() );
     }
 
+    public ApiReceipt( int id, String name, List<ApiIngredient> ingredients, List<ApiSteps> steps, int servings, String image ) {
+        this.id = id;
+        this.name = name;
+        this.ingredients = ingredients;
+        this.steps = steps;
+        this.servings = servings;
+        this.image = image;
+    }
+
     public int getId() {
         return id;
     }

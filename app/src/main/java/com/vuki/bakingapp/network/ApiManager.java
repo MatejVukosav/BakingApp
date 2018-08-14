@@ -16,6 +16,7 @@ public class ApiManager implements ApiManagerInterface {
     private static ApiManager apiManagerInstance;
     private static ApiManagerService apiManagerService;
     private static Moshi moshi;
+    private static OkHttpClient client;
 
     private ApiManager() {
     }
@@ -24,7 +25,7 @@ public class ApiManager implements ApiManagerInterface {
         if ( apiManagerInstance == null ) {
             apiManagerInstance = new ApiManager();
 
-            OkHttpClient client = new OkHttpClient.Builder()
+            client = new OkHttpClient.Builder()
                     .addInterceptor( new LoggingInterceptor( LoggingInterceptor.LogLevel.NONE ) )
                     .build();
 
@@ -45,6 +46,10 @@ public class ApiManager implements ApiManagerInterface {
     @Override
     public ApiManagerService getService() {
         return apiManagerService;
+    }
+
+    public static OkHttpClient getClient() {
+        return client;
     }
 
     static Moshi getMoshi() {

@@ -58,7 +58,6 @@ public class HomeActivity extends AppCompatActivity
         } else {
             binding.recyclerView.setLayoutManager( new LinearLayoutManager( this ) );
         }
-
     }
 
     @Override
@@ -74,6 +73,7 @@ public class HomeActivity extends AppCompatActivity
         Bundle bundle = new Bundle();
         bundle.putSerializable( RecipeDetailsActivity.EXTRA_RECEIPT, apiReceipt );
         intent.putExtras( bundle );
+        intent.setAction( "dinamo" );
         startActivity( intent );
     }
 }

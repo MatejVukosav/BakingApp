@@ -29,6 +29,14 @@ public class ApiSteps implements Serializable {
         thumbnailUrl = in.readString();
     }
 
+    public ApiSteps( int id, String shortDescription, String description, String videoUrl, String thumbnailUrl ) {
+        this.id = id;
+        this.shortDescription = shortDescription;
+        this.description = description;
+        this.videoUrl = videoUrl;
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
     public int getId() {
         return id;
     }

@@ -32,8 +32,6 @@ public class RecipeDetailsActivity
     public static String EXTRA_RECEIPT = "receipt";
     public static String STEPS = "steps";
     public static String SAVED_INSTANCE_CURRENT_STEP = "saved_instance_current_step";
-    public static String SAVED_INSTANCE_PLAY_WHEN_READY = "saved_instance_play_when_ready";
-    public static String SAVED_INSTANCE_PLAYED_VIDEO_POSITION = "saved_instance_played_video_position";
     public static String SAVED_INSTANCE_RECEIPT = "saved_instance_receipt";
     private static String SAVED_INSTANCE_RECEIPT_DETAILS_FRAGMENT = "receipt_details_fragment";
     public static String SAVED_INSTANCE_STEPS_FRAGMENT = "steps_fragment";
@@ -55,10 +53,12 @@ public class RecipeDetailsActivity
         if ( receipt != null ) {
             if ( savedInstanceState == null ) {
                 if ( getResources().getBoolean( R.bool.isTablet ) ) {
-                    stepFragment = StepFragment.newInstance( receipt.getSteps().get( 0 ), true, 0 );
-                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                    ft.replace( R.id.fragment_step, stepFragment );
-                    ft.commit();
+                    if ( receipt.getSteps() != null && !receipt.getSteps().isEmpty() ) {
+                        stepFragment = StepFragment.newInstance( receipt.getSteps().get( 0 ), true, 0 );
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        ft.replace( R.id.fragment_step, stepFragment );
+                        ft.commit();
+                    }
                 }
                 receiptDetailsFragment = ReceiptDetailsFragment.newInstance( receipt );
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -66,8 +66,10 @@ public class RecipeDetailsActivity
                 ft.commit();
             } else {
                 if ( getResources().getBoolean( R.bool.isTablet ) ) {
-                    receiptDetailsFragment = (ReceiptDetailsFragment) getSupportFragmentManager().getFragment( savedInstanceState, SAVED_INSTANCE_RECEIPT_DETAILS_FRAGMENT );
-                    stepFragment = (StepFragment) getSupportFragmentManager().getFragment( savedInstanceState, SAVED_INSTANCE_STEPS_FRAGMENT );
+                    receiptDetailsFragment = (ReceiptDetailsFragment) getSupportFragmentManager()
+                            .getFragment( savedInstanceState, SAVED_INSTANCE_RECEIPT_DETAILS_FRAGMENT );
+                    stepFragment = (StepFragment) getSupportFragmentManager()
+                            .getFragment( savedInstanceState, SAVED_INSTANCE_STEPS_FRAGMENT );
 
                     currentStep = savedInstanceState.getInt( SAVED_INSTANCE_CURRENT_STEP );
                     receipt = (ApiReceipt) savedInstanceState.getSerializable( SAVED_INSTANCE_RECEIPT );
@@ -79,6 +81,7 @@ public class RecipeDetailsActivity
             }
         }
 
+        //TODO Why with Brownies recipe focus on recylcer view and not on the beginning of the screen with this line..
         if ( !getResources().getBoolean( R.bool.isTablet ) ) {
             binding.nestedScrollView.fullScroll( View.FOCUS_UP );
         }

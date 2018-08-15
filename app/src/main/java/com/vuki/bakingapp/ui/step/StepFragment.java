@@ -30,6 +30,8 @@ import com.vuki.bakingapp.databinding.FragmentStepBinding;
 import com.vuki.bakingapp.models.ApiSteps;
 import com.vuki.bakingapp.player.SessionCallback;
 
+import static com.vuki.bakingapp.ui.details.RecipeDetailsActivity.SAVED_INSTANCE_CURRENT_STEP;
+
 /**
  * Created by mvukosav
  */
@@ -41,6 +43,10 @@ public class StepFragment extends Fragment implements Player.EventListener {
     public static String ARGUMENT_STEP = "currentStep";
     public static String ARGUMENT_VIDEO_POSITION = "video_position";
     public static String ARGUMENT_PLAY_WHEN_READY = "play_when_ready";
+
+    public static String SAVED_INSTANCE_PLAY_WHEN_READY = "saved_instance_play_when_ready";
+    public static String SAVED_INSTANCE_PLAYED_VIDEO_POSITION = "saved_instance_played_video_position";
+
     private PlaybackStateCompat.Builder mStateBuilder;
     private static MediaSessionCompat mMediaSession;
     private Context context;
@@ -137,14 +143,30 @@ public class StepFragment extends Fragment implements Player.EventListener {
     @Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
-        currentStep = (ApiSteps) getArguments().getSerializable( ARGUMENT_STEP );
-        playWhenReady = (boolean) getArguments().getSerializable( ARGUMENT_PLAY_WHEN_READY );
-        videoPosition = (long) getArguments().getSerializable( ARGUMENT_VIDEO_POSITION );
+
+        if ( savedInstanceState == null ) {
+            currentStep = (ApiSteps) getArguments().getSerializable( ARGUMENT_STEP );
+            playWhenReady = (boolean) getArguments().getSerializable( ARGUMENT_PLAY_WHEN_READY );
+            videoPosition = (long) getArguments().getSerializable( ARGUMENT_VIDEO_POSITION );
+        } else {
+            currentStep = (ApiSteps) savedInstanceState.getSerializable( SAVED_INSTANCE_CURRENT_STEP );
+            playWhenReady = savedInstanceState.getBoolean( SAVED_INSTANCE_PLAY_WHEN_READY );
+            videoPosition = savedInstanceState.getLong( SAVED_INSTANCE_PLAYED_VIDEO_POSITION );
+        }
 
         this.context = getContext();
         exoPlayerManager = new ExoPlayerManager();
 
         initializeMediaSession();
+    }
+
+    @Override
+    public void onSaveInstanceState( @NonNull Bundle outState ) {
+        outState.putSerializable( SAVED_INSTANCE_CURRENT_STEP, currentStep );
+        outState.putBoolean( SAVED_INSTANCE_PLAY_WHEN_READY, shouldVideoAutoStart() );
+        outState.putLong( SAVED_INSTANCE_PLAYED_VIDEO_POSITION, getPlayedVideoLocation() );
+
+        super.onSaveInstanceState( outState );
     }
 
     @Override
@@ -181,6 +203,7 @@ public class StepFragment extends Fragment implements Player.EventListener {
         exoPlayerManager.initializePlayer( context, this );
         binding.playerView.setPlayer( exoPlayerManager.getPlayer() );
 
+        //TODO this does not setup right in tablet mode when change screen orientation
         exoPlayerManager.getPlayer().setPlayWhenReady( playWhenReady );
         exoPlayerManager.getPlayer().seekTo( videoPosition );
         populateData( currentStep );
@@ -254,11 +277,4 @@ public class StepFragment extends Fragment implements Player.EventListener {
         return Math.max( 0, exoPlayerManager.getPlayer().getContentPosition() );
     }
 
-    public void setPlayWhenReady( boolean playWhenReady ) {
-        this.playWhenReady = playWhenReady;
-    }
-
-    public void setVideoPosition( long videoPosition ) {
-        this.videoPosition = videoPosition;
-    }
 }

@@ -34,6 +34,7 @@ public class StepActivity extends BaseActivity implements StepFragment.OnChangeS
         if ( extras == null ) {
             finish();
         } else {
+            //TODO Unchecked cast to serializable?? How should I solve that warning?
             steps = (List<ApiSteps>) extras.getSerializable( RecipeDetailsActivity.STEPS );
             currentStepIndex = extras.getInt( RecipeDetailsActivity.CURRENT_STEP );
         }
@@ -47,12 +48,8 @@ public class StepActivity extends BaseActivity implements StepFragment.OnChangeS
         } else {
             stepFragment = (StepFragment) getSupportFragmentManager().getFragment( savedInstanceState, SAVED_INSTANCE_STEPS_FRAGMENT );
             currentStepIndex = savedInstanceState.getInt( SAVED_INSTANCE_CURRENT_STEP );
-            boolean playWhenReady = savedInstanceState.getBoolean( RecipeDetailsActivity.SAVED_INSTANCE_PLAY_WHEN_READY );
-            long playedVideoPosition = savedInstanceState.getLong( RecipeDetailsActivity.SAVED_INSTANCE_PLAYED_VIDEO_POSITION );
             currentStep = steps.get( currentStepIndex );
             stepFragment.currentStep = currentStep;
-            stepFragment.setPlayWhenReady( playWhenReady );
-            stepFragment.setVideoPosition( playedVideoPosition );
         }
         setupToolbar( currentStep );
 
@@ -72,8 +69,6 @@ public class StepActivity extends BaseActivity implements StepFragment.OnChangeS
     @Override
     protected void onSaveInstanceState( Bundle outState ) {
         outState.putInt( SAVED_INSTANCE_CURRENT_STEP, currentStepIndex );
-        outState.putBoolean( RecipeDetailsActivity.SAVED_INSTANCE_PLAY_WHEN_READY, stepFragment.shouldVideoAutoStart() );
-        outState.putLong( RecipeDetailsActivity.SAVED_INSTANCE_PLAYED_VIDEO_POSITION, stepFragment.getPlayedVideoLocation() );
         getSupportFragmentManager().putFragment( outState, SAVED_INSTANCE_STEPS_FRAGMENT, stepFragment );
         super.onSaveInstanceState( outState );
     }

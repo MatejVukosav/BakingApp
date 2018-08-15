@@ -67,7 +67,7 @@ public class HomeActivityTest {
                 .perform( RecyclerViewActions.scrollToPosition( 0 ) )
                 .perform( RecyclerViewActions.actionOnItemAtPosition( 0, ViewActions.click() ) );
 
-        // This does not work? Why? Also how can I check that right object is send inside bundle
+        //TODO This does not work? Why? Also how can I check that right object is send inside bundle
 //        intended(
 //                hasExtras(
 //                        allOf(

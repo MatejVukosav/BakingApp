@@ -53,7 +53,7 @@ public class ReceiptDetailsFragment
     @Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
-        receipt = (ApiReceipt) getArguments().getSerializable( "receipt" );
+        receipt = (ApiReceipt) getArguments().getSerializable( RecipeDetailsActivity.EXTRA_RECEIPT );
     }
 
     @Override

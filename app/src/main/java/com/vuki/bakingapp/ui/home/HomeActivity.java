@@ -30,7 +30,7 @@ public class HomeActivity extends AppCompatActivity
 
     private ActivityMainBinding binding;
     private HomeRecyclerViewAdapter adapter;
-    private List<ApiReceipt> items = null;
+    public List<ApiReceipt> items = null;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -72,8 +72,7 @@ public class HomeActivity extends AppCompatActivity
         ApiReceipt apiReceipt = items.get( position );
         Bundle bundle = new Bundle();
         bundle.putSerializable( RecipeDetailsActivity.EXTRA_RECEIPT, apiReceipt );
-        intent.putExtras( bundle );
-        intent.setAction( "dinamo" );
+        intent.putExtras(bundle );
         startActivity( intent );
     }
 }

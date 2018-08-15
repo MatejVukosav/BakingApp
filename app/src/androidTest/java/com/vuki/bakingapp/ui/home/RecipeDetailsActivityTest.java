@@ -1,81 +1,69 @@
 package com.vuki.bakingapp.ui.home;
 
-import android.support.test.espresso.ViewInteraction;
-import android.support.test.rule.ActivityTestRule;
+import android.app.Activity;
+import android.app.Instrumentation;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.test.espresso.action.ViewActions;
+import android.support.test.espresso.assertion.ViewAssertions;
+import android.support.test.espresso.intent.rule.IntentsTestRule;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 
 import com.vuki.bakingapp.R;
+import com.vuki.bakingapp.models.ApiIngredient;
+import com.vuki.bakingapp.models.ApiReceipt;
+import com.vuki.bakingapp.models.ApiSteps;
+import com.vuki.bakingapp.ui.details.RecipeDetailsActivity;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.is;
+import static android.support.test.espresso.intent.Intents.intending;
+import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class RecipeDetailsActivityTest {
 
     @Rule
-    public ActivityTestRule<HomeActivity> mActivityTestRule = new ActivityTestRule<>( HomeActivity.class );
+    public IntentsTestRule<RecipeDetailsActivity> intentsTestRule
+            = new IntentsTestRule<>( RecipeDetailsActivity.class );
 
     @Test
-    public void toolbarTitleIsRightSetup() {
+    public void is_toolbar_title_correct_setup() throws Exception {
+        ApiReceipt recipe = createTestRecipe();
+        Intent intent = createTestRecipeIntent( recipe );
 
+        // Build the result to return when the activity is launched.
+        Instrumentation.ActivityResult result = new Instrumentation.ActivityResult( Activity.RESULT_OK, intent );
+        intending( hasComponent( RecipeDetailsActivity.class.getName() ) )
+                .respondWith( result );
 
-        ViewInteraction recyclerView = onView(
-                allOf( withId( R.id.recycler_view ),
-                        childAtPosition(
-                                withClassName( is( "android.support.constraint.ConstraintLayout" ) ),
-                                0 ) ) );
-        recyclerView.perform( actionOnItemAtPosition( 0, click() ) );
-
-        ViewInteraction textView = onView(
-                allOf( withText( "Nutella Pie" ),
-                        childAtPosition(
-                                allOf( withId( R.id.toolbar ),
-                                        childAtPosition(
-                                                IsInstanceOf.<View>instanceOf( android.widget.LinearLayout.class ),
-                                                0 ) ),
-                                1 ),
-                        isDisplayed() ) );
-        textView.check( matches( withText( "Nutella Pie" ) ) );
-
+        onView( ViewMatchers.withId( R.id.toolbar ) )
+                .perform( ViewActions.scrollTo() ) //Error performing 'scroll to' on view 'with id: com.vuki.bakingapp:id/toolbar'.
+                .check( ViewAssertions.matches( ViewMatchers.withText( recipe.getName() ) ) );
     }
 
-    private static Matcher<View> childAtPosition(
-            final Matcher<View> parentMatcher, final int position ) {
+    private Intent createTestRecipeIntent( ApiReceipt recipe ) {
+        Intent intent = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable( RecipeDetailsActivity.EXTRA_RECEIPT, recipe );
+        intent.putExtras( bundle );
+        return intent;
+    }
 
-        return new TypeSafeMatcher<View>() {
-            @Override
-            public void describeTo( Description description ) {
-                description.appendText( "Child at position " + position + " in parent " );
-                parentMatcher.describeTo( description );
-            }
-
-            @Override
-            public boolean matchesSafely( View view ) {
-                ViewParent parent = view.getParent();
-                return parent instanceof ViewGroup && parentMatcher.matches( parent )
-                        && view.equals( ( (ViewGroup) parent ).getChildAt( position ) );
-            }
-        };
+    private ApiReceipt createTestRecipe() {
+        return new ApiReceipt( 1,
+                "test receipt name",
+                new ArrayList<ApiIngredient>(),
+                new ArrayList<ApiSteps>(),
+                0,
+                null );
     }
 }

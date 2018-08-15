@@ -24,7 +24,7 @@ public class RecipeDetailsActivity
         StepFragment.OnChangeStepListener {
 
     private ActivityRecipeDetailsBinding binding;
-    private ApiReceipt receipt;
+    public ApiReceipt receipt;
     private ReceiptDetailsFragment receiptDetailsFragment;
     private int currentStep = 0;
     private StepFragment stepFragment;
@@ -52,27 +52,29 @@ public class RecipeDetailsActivity
             }
         }
 
-        if ( savedInstanceState == null ) {
-            if ( getResources().getBoolean( R.bool.isTablet ) ) {
-                stepFragment = StepFragment.newInstance( receipt.getSteps().get( 0 ), true, 0 );
+        if ( receipt != null ) {
+            if ( savedInstanceState == null ) {
+                if ( getResources().getBoolean( R.bool.isTablet ) ) {
+                    stepFragment = StepFragment.newInstance( receipt.getSteps().get( 0 ), true, 0 );
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace( R.id.fragment_step, stepFragment );
+                    ft.commit();
+                }
+                receiptDetailsFragment = ReceiptDetailsFragment.newInstance( receipt );
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace( R.id.fragment_step, stepFragment );
+                ft.replace( R.id.fragment_receipt_steps, receiptDetailsFragment );
                 ft.commit();
-            }
-            receiptDetailsFragment = ReceiptDetailsFragment.newInstance( receipt );
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace( R.id.fragment_receipt_steps, receiptDetailsFragment );
-            ft.commit();
-        } else {
-            if ( getResources().getBoolean( R.bool.isTablet ) ) {
-                receiptDetailsFragment = (ReceiptDetailsFragment) getSupportFragmentManager().getFragment( savedInstanceState, SAVED_INSTANCE_RECEIPT_DETAILS_FRAGMENT );
-                stepFragment = (StepFragment) getSupportFragmentManager().getFragment( savedInstanceState, SAVED_INSTANCE_STEPS_FRAGMENT );
+            } else {
+                if ( getResources().getBoolean( R.bool.isTablet ) ) {
+                    receiptDetailsFragment = (ReceiptDetailsFragment) getSupportFragmentManager().getFragment( savedInstanceState, SAVED_INSTANCE_RECEIPT_DETAILS_FRAGMENT );
+                    stepFragment = (StepFragment) getSupportFragmentManager().getFragment( savedInstanceState, SAVED_INSTANCE_STEPS_FRAGMENT );
 
-                currentStep = savedInstanceState.getInt( SAVED_INSTANCE_CURRENT_STEP );
-                receipt = (ApiReceipt) savedInstanceState.getSerializable( SAVED_INSTANCE_RECEIPT );
-                if ( isReceiptValid() ) {
-                    stepFragment.currentStep = receipt.getSteps().get( currentStep );
-                    setupToolbar( receipt.getSteps().get( currentStep ) );
+                    currentStep = savedInstanceState.getInt( SAVED_INSTANCE_CURRENT_STEP );
+                    receipt = (ApiReceipt) savedInstanceState.getSerializable( SAVED_INSTANCE_RECEIPT );
+                    if ( isReceiptValid() ) {
+                        stepFragment.currentStep = receipt.getSteps().get( currentStep );
+                        setupToolbar( receipt.getSteps().get( currentStep ) );
+                    }
                 }
             }
         }

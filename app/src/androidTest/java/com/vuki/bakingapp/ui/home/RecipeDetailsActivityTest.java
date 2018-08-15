@@ -4,10 +4,9 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.test.espresso.action.ViewActions;
-import android.support.test.espresso.assertion.ViewAssertions;
-import android.support.test.espresso.intent.rule.IntentsTestRule;
+import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.matcher.ViewMatchers;
+import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
@@ -24,19 +23,43 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.scrollTo;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class RecipeDetailsActivityTest {
 
+//    @Rule
+//    public IntentsTestRule<RecipeDetailsActivity> intentsTestRule
+//            = new IntentsTestRule<>( RecipeDetailsActivity.class );
+
     @Rule
-    public IntentsTestRule<RecipeDetailsActivity> intentsTestRule
-            = new IntentsTestRule<>( RecipeDetailsActivity.class );
+    public ActivityTestRule<RecipeDetailsActivity> recipeDetailsActivityActivityTestRule =
+            new ActivityTestRule<RecipeDetailsActivity>( RecipeDetailsActivity.class ) {
+
+                @Override
+                protected Intent getActivityIntent() {
+                    return createTestRecipeIntent( createTestRecipe() );
+                }
+            };
 
     @Test
-    public void is_toolbar_title_correct_setup() throws Exception {
+    public void toolbar_set_title_from_intent_data() {
+        ApiReceipt recipe = createTestRecipe();
+
+        ViewInteraction viewInteraction = onView( ViewMatchers.withId( R.id.toolbar ) );
+
+        viewInteraction.check( matches( ViewMatchers.isDisplayed() ) );
+        onView( withText( recipe.getName() ) )
+                .check( matches( ViewMatchers.withParent( ViewMatchers.withId( R.id.toolbar ) ) ) );
+    }
+
+    @Test
+    public void toolbar_title_setup_invalid_test() {
         ApiReceipt recipe = createTestRecipe();
         Intent intent = createTestRecipeIntent( recipe );
 
@@ -45,9 +68,12 @@ public class RecipeDetailsActivityTest {
         intending( hasComponent( RecipeDetailsActivity.class.getName() ) )
                 .respondWith( result );
 
-        onView( ViewMatchers.withId( R.id.toolbar ) )
-                .perform( ViewActions.scrollTo() ) //Error performing 'scroll to' on view 'with id: com.vuki.bakingapp:id/toolbar'.
-                .check( ViewAssertions.matches( ViewMatchers.withText( recipe.getName() ) ) );
+        ViewInteraction viewInteraction = onView( ViewMatchers.withId( R.id.toolbar ) );
+        viewInteraction.check( matches( ViewMatchers.isDisplayed() ) );
+        //why this does not work?
+        viewInteraction
+                .perform( scrollTo() ) //Error performing 'scroll to' on view 'with id: com.vuki.bakingapp:id/toolbar'.
+                .check( matches( withText( recipe.getName() ) ) );
     }
 
     private Intent createTestRecipeIntent( ApiReceipt recipe ) {

@@ -206,9 +206,6 @@ public class StepFragment extends Fragment implements Player.EventListener {
         exoPlayerManager.initializePlayer(context, this);
         binding.playerView.setPlayer(exoPlayerManager.getPlayer());
 
-        /*  Activity must have: android:configChanges="orientation|screenSize|layoutDirection" in
-            order to playback continues on orientation change.
-         */
         exoPlayerManager.getPlayer().setPlayWhenReady(playWhenReady);
         exoPlayerManager.getPlayer().seekTo(videoPosition);
         populateData(currentStep);
@@ -260,6 +257,8 @@ public class StepFragment extends Fragment implements Player.EventListener {
     }
 
     private MediaSource prepareMediaSource() {
+
+
         String userAgent = Util.getUserAgent(getContext(), getApplicationName(context));
         return new ExtractorMediaSource.Factory(
                 new DefaultDataSourceFactory(

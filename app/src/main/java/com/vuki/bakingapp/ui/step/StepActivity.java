@@ -26,56 +26,60 @@ public class StepActivity extends BaseActivity implements StepFragment.OnChangeS
     private ApiSteps currentStep;
 
     @Override
-    protected void onCreate( Bundle savedInstanceState ) {
-        super.onCreate( savedInstanceState );
-        binding = DataBindingUtil.setContentView( this, R.layout.activity_step );
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_step);
 
         Bundle extras = getIntent().getExtras();
-        if ( extras == null ) {
+        if (extras == null) {
             finish();
         } else {
-            //TODO Unchecked cast to serializable?? How should I solve that warning?
-            steps = (List<ApiSteps>) extras.getSerializable( RecipeDetailsActivity.STEPS );
-            currentStepIndex = extras.getInt( RecipeDetailsActivity.CURRENT_STEP );
+            try {
+                //noinspection unchecked
+                steps = (List<ApiSteps>) extras.getSerializable(RecipeDetailsActivity.STEPS);
+            } catch (ClassCastException cex) {
+                cex.printStackTrace();
+            }
+            currentStepIndex = extras.getInt(RecipeDetailsActivity.CURRENT_STEP);
         }
 
-        if ( savedInstanceState == null ) {
-            currentStep = steps.get( currentStepIndex );
-            stepFragment = StepFragment.newInstance( currentStep, true, 0 );
+        if (savedInstanceState == null) {
+            currentStep = steps.get(currentStepIndex);
+            stepFragment = StepFragment.newInstance(currentStep, true, 0);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace( R.id.fragment, stepFragment );
+            ft.replace(R.id.fragment, stepFragment);
             ft.commit();
         } else {
-            stepFragment = (StepFragment) getSupportFragmentManager().getFragment( savedInstanceState, SAVED_INSTANCE_STEPS_FRAGMENT );
-            currentStepIndex = savedInstanceState.getInt( SAVED_INSTANCE_CURRENT_STEP );
-            currentStep = steps.get( currentStepIndex );
+            stepFragment = (StepFragment) getSupportFragmentManager().getFragment(savedInstanceState, SAVED_INSTANCE_STEPS_FRAGMENT);
+            currentStepIndex = savedInstanceState.getInt(SAVED_INSTANCE_CURRENT_STEP);
+            currentStep = steps.get(currentStepIndex);
             stepFragment.currentStep = currentStep;
         }
-        setupToolbar( currentStep );
+        setupToolbar(currentStep);
 
-        if ( this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ) {
-            binding.toolbar.setVisibility( View.GONE );
+        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            binding.toolbar.setVisibility(View.GONE);
         } else {
-            binding.toolbar.setVisibility( View.VISIBLE );
+            binding.toolbar.setVisibility(View.VISIBLE);
         }
     }
 
-    private void setupToolbar( ApiSteps step ) {
-        setupToolbar( binding.toolbar, currentStepIndex == 0
+    private void setupToolbar(ApiSteps step) {
+        setupToolbar(binding.toolbar, currentStepIndex == 0
                 ? step.getShortDescription()
-                : currentStepIndex + ". " + step.getShortDescription() );
+                : currentStepIndex + ". " + step.getShortDescription());
     }
 
     @Override
-    protected void onSaveInstanceState( Bundle outState ) {
-        outState.putInt( SAVED_INSTANCE_CURRENT_STEP, currentStepIndex );
-        getSupportFragmentManager().putFragment( outState, SAVED_INSTANCE_STEPS_FRAGMENT, stepFragment );
-        super.onSaveInstanceState( outState );
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(SAVED_INSTANCE_CURRENT_STEP, currentStepIndex);
+        getSupportFragmentManager().putFragment(outState, SAVED_INSTANCE_STEPS_FRAGMENT, stepFragment);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     public void previous() {
-        if ( currentStepIndex == 0 ) {
+        if (currentStepIndex == 0) {
             return;
         }
         currentStepIndex--;
@@ -84,7 +88,7 @@ public class StepActivity extends BaseActivity implements StepFragment.OnChangeS
 
     @Override
     public void next() {
-        if ( currentStepIndex == steps.size() - 1 ) {
+        if (currentStepIndex == steps.size() - 1) {
             return;
         }
         currentStepIndex++;
@@ -92,9 +96,9 @@ public class StepActivity extends BaseActivity implements StepFragment.OnChangeS
     }
 
     private void changeStep() {
-        currentStep = steps.get( currentStepIndex );
-        setupToolbar( currentStep );
-        stepFragment.populateData( currentStep );
+        currentStep = steps.get(currentStepIndex);
+        setupToolbar(currentStep);
+        stepFragment.populateData(currentStep);
     }
 
 }

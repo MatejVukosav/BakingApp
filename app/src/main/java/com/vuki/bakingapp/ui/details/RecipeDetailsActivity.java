@@ -81,7 +81,7 @@ public class RecipeDetailsActivity
             }
         }
 
-        //TODO Why with Brownies recipe focus on recylcer view and not on the beginning of the screen with this line..
+        //TODO Why with Brownies recipe focus on recyler view and not on the beginning of the screen with this line..
         if ( !getResources().getBoolean( R.bool.isTablet ) ) {
             binding.nestedScrollView.fullScroll( View.FOCUS_UP );
         }

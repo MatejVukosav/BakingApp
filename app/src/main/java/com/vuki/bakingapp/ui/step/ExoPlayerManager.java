@@ -36,7 +36,7 @@ public class ExoPlayerManager {
     }
 
     public void setMediaSource( MediaSource source ) {
-        player.prepare( source );
+        player.prepare( source,false,false );
         player.setPlayWhenReady( true );
     }
 

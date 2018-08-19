@@ -23,8 +23,7 @@
             android:launchMode="singleTop">
         </activity>
         <activity
-            android:name=".ui.step.StepActivity"
-            android:configChanges="orientation|screenSize|layoutDirection">
+            android:name=".ui.step.StepActivity">
         </activity>
 
         <!--APP WIDGET-->

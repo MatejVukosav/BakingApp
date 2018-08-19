@@ -145,16 +145,6 @@ public class StepFragment extends Fragment implements Player.EventListener {
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
 
-        if ( savedInstanceState == null ) {
-            currentStep = (ApiSteps) getArguments().getSerializable( ARGUMENT_STEP );
-            playWhenReady = (boolean) getArguments().getSerializable( ARGUMENT_PLAY_WHEN_READY );
-            videoPosition = (long) getArguments().getSerializable( ARGUMENT_VIDEO_POSITION );
-        } else {
-            currentStep = (ApiSteps) savedInstanceState.getSerializable( SAVED_INSTANCE_CURRENT_STEP );
-            playWhenReady = savedInstanceState.getBoolean( SAVED_INSTANCE_PLAY_WHEN_READY );
-            videoPosition = savedInstanceState.getLong( SAVED_INSTANCE_PLAYED_VIDEO_POSITION );
-        }
-
         this.context = getContext();
         exoPlayerManager = new ExoPlayerManager();
 
@@ -165,7 +155,6 @@ public class StepFragment extends Fragment implements Player.EventListener {
     public void onStart() {
         super.onStart();
         if ( Util.SDK_INT > Build.VERSION_CODES.M ) {
-            exoPlayerManager.initializePlayer( context, this );
             setupPlayer();
         }
     }
@@ -174,7 +163,6 @@ public class StepFragment extends Fragment implements Player.EventListener {
     public void onResume() {
         super.onResume();
         if ( ( Util.SDK_INT <= Build.VERSION_CODES.M || exoPlayerManager.getPlayer() == null ) ) {
-            exoPlayerManager.initializePlayer( context, this );
             setupPlayer();
         }
     }
@@ -205,7 +193,7 @@ public class StepFragment extends Fragment implements Player.EventListener {
     }
 
     @Override
-    public View onCreateView( LayoutInflater inflater, ViewGroup container,
+    public View onCreateView( @NonNull LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState ) {
         binding = DataBindingUtil.inflate( inflater, R.layout.fragment_step, container, false );
         binding.next.setOnClickListener( new View.OnClickListener() {
@@ -218,14 +206,27 @@ public class StepFragment extends Fragment implements Player.EventListener {
             @Override
             public void onClick( View v ) {
                 listener.previous();
-
             }
         } );
+
+        if ( savedInstanceState == null ) {
+            Bundle arguments = getArguments();
+            if ( arguments != null ) {
+                currentStep = (ApiSteps) arguments.getSerializable( ARGUMENT_STEP );
+                playWhenReady = (boolean) arguments.getSerializable( ARGUMENT_PLAY_WHEN_READY );
+                videoPosition = (long) arguments.getSerializable( ARGUMENT_VIDEO_POSITION );
+            }
+        } else {
+            currentStep = (ApiSteps) savedInstanceState.getSerializable( SAVED_INSTANCE_CURRENT_STEP );
+            playWhenReady = savedInstanceState.getBoolean( SAVED_INSTANCE_PLAY_WHEN_READY );
+            videoPosition = savedInstanceState.getLong( SAVED_INSTANCE_PLAYED_VIDEO_POSITION );
+        }
 
         return binding.getRoot();
     }
 
-    private void setupPlayer() {
+    private void setupPlayer(){
+        exoPlayerManager.initializePlayer( context, this );
         binding.playerView.setPlayer( exoPlayerManager.getPlayer() );
 
         exoPlayerManager.getPlayer().setPlayWhenReady( playWhenReady );

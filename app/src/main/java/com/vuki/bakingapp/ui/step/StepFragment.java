@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -161,18 +162,46 @@ public class StepFragment extends Fragment implements Player.EventListener {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        if ( Util.SDK_INT > Build.VERSION_CODES.M ) {
+            exoPlayerManager.initializePlayer( context, this );
+            setupPlayer();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if ( ( Util.SDK_INT <= Build.VERSION_CODES.M || exoPlayerManager.getPlayer() == null ) ) {
+            exoPlayerManager.initializePlayer( context, this );
+            setupPlayer();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if ( Util.SDK_INT <= Build.VERSION_CODES.M ) {
+            exoPlayerManager.releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if ( Util.SDK_INT > Build.VERSION_CODES.M ) {
+            exoPlayerManager.releasePlayer();
+        }
+    }
+
+    @Override
     public void onSaveInstanceState( @NonNull Bundle outState ) {
         outState.putSerializable( SAVED_INSTANCE_CURRENT_STEP, currentStep );
         outState.putBoolean( SAVED_INSTANCE_PLAY_WHEN_READY, shouldVideoAutoStart() );
         outState.putLong( SAVED_INSTANCE_PLAYED_VIDEO_POSITION, getPlayedVideoLocation() );
 
         super.onSaveInstanceState( outState );
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        exoPlayerManager.releasePlayer();
     }
 
     @Override
@@ -196,14 +225,9 @@ public class StepFragment extends Fragment implements Player.EventListener {
         return binding.getRoot();
     }
 
-    @Override
-    public void onViewCreated( @NonNull View view, @Nullable Bundle savedInstanceState ) {
-        super.onViewCreated( view, savedInstanceState );
-
-        exoPlayerManager.initializePlayer( context, this );
+    private void setupPlayer() {
         binding.playerView.setPlayer( exoPlayerManager.getPlayer() );
 
-        //TODO this does not setup right in tablet mode when change screen orientation
         exoPlayerManager.getPlayer().setPlayWhenReady( playWhenReady );
         exoPlayerManager.getPlayer().seekTo( videoPosition );
         populateData( currentStep );
